@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Security.AccessControl
 
 Module Module1
 
@@ -239,15 +240,21 @@ Module Module1
 
 #Region "Logging"
 
+    Private Function LogRoot() As DirectoryInfo
+        Return New DirectoryInfo(
+            Path.Combine(
+                new FileInfo(System.Reflection.Assembly.GetExecutingAssembly.GetName.FullName).Directory.FullName,
+                "logs"
+            )
+        )
+
+    End Function
+
     Private Function LogFolder() As DirectoryInfo
         Return New DirectoryInfo(
             Path.Combine(
-                Environment.GetEnvironmentVariable("SystemRoot"),
-                String.Format(
-                    "logs\{0}\{1}",
-                    System.Reflection.Assembly.GetExecutingAssembly.GetName.Name,
-                    Now.ToString("yyyy-MM")
-                )
+                LogRoot.FullName,
+                Now.ToString("yyyy-MM")
             )
         )
 
@@ -272,20 +279,18 @@ Module Module1
 
     Public Sub Log(ByVal str, ByVal ParamArray args())
         Console.WriteLine(String.Format(str, args))
-        Dim done As Boolean = False
-        While Not done
-            Try
-                Using log As New StreamWriter(currentlog.FullName, True)
-                    log.WriteLine("{0}> {1}", Format(Now, "hh:mm:ss"), String.Format(str, args))
-                End Using
-                done = True
 
-            Catch ex As Exception
-                Threading.Thread.Sleep(500)
+        Try
+            Using log As New StreamWriter(currentlog.FullName, True)
+                log.WriteLine("{0}> {1}", Format(Now, "hh:mm:ss"), String.Format(str, args))
+            End Using
 
-            End Try
+        Catch ex As Exception
+            Console.WriteLine(ex.Message)
 
-        End While
+        End Try
+
+
     End Sub
 
 #End Region
