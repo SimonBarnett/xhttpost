@@ -45,6 +45,8 @@ Module Module1
                         Using sr As New StreamReader(arg("x"))
                             Log("Sending [{0}] to [{1}]...", arg("x"), arg("u"))
                             Console.WriteLine(Post(arg("u"), sr.ReadToEnd).ToString())
+                            sr.Close()
+
                             If .Contains("m") Then
                                 Move(arg("x"), arg("m"))
                             ElseIf .Contains("d") Then
@@ -58,6 +60,7 @@ Module Module1
                                 Log("Sending [{0}] to [{1}]...", F, arg("u"))
                                 Try
                                     Console.WriteLine(Post(arg("u"), sr.ReadToEnd))
+                                    sr.Close()
                                     If .Contains("m") Then
                                         Move(F, arg("m"))
                                     ElseIf .Contains("d") Then
